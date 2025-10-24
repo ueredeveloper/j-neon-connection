@@ -1,15 +1,17 @@
 package com.ueredeveloper.neon_connection.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Table(name = "processo")
+@Table(name = "anexo")
 @Getter
 @Setter
-public class ProcessoModel {
+public class AnexoModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,15 +20,13 @@ public class ProcessoModel {
     @Column(unique = true, nullable = false, length = 40)
     private String numero;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "anexo_id")
-    @JsonBackReference
-    private AnexoModel anexo;
+    @OneToMany(mappedBy = "anexo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProcessoModel> processos = new ArrayList<>();
 
-    public ProcessoModel() {
+    public AnexoModel() {
     }
 
-    public ProcessoModel(String numero) {
+    public AnexoModel(String numero) {
         this.numero = numero;
     }
 

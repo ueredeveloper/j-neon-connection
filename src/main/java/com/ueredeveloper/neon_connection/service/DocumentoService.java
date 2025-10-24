@@ -31,6 +31,9 @@ public class DocumentoService {
     @Autowired
     private TipoDocumentoRepository tipoDocumentoRepository;
 
+    @Autowired
+    private AnexoRepository anexoRepository;
+
     @Transactional
     public DocumentoDTO save(DocumentoDTO dto) {
 
@@ -47,14 +50,44 @@ public class DocumentoService {
 
         // PROCESSO
         if (dto.getProcesso() != null && dto.getProcesso().getNumero() != null) {
+            AnexoModel anexo = null;
+            // 1. Verifica e persiste o ANEXO
+            if (dto.getProcesso().getAnexo() != null) {
+                AnexoDTO anexoDTO = dto.getProcesso().getAnexo();
+                // Valida o número do anexo, pois é obrigatório no modelo
+                if (anexoDTO.getNumero() == null || anexoDTO.getNumero().trim().isEmpty()) {
+                    throw new IllegalArgumentException(
+                            "Número do anexo não pode ser nulo ou vazio se o anexo for fornecido.");
+                }
+
+                if (anexoDTO.getId() != null) {
+                    // Tenta buscar pelo ID. Se não encontrar, cria um novo.
+                    anexo = anexoRepository.findById(anexoDTO.getId())
+                            .orElse(new AnexoModel());
+                } else {
+                    anexo = new AnexoModel();
+                }
+                anexo.setNumero(anexoDTO.getNumero());
+                anexo = anexoRepository.save(anexo); // Salva o AnexoModel para torná-lo persistente
+            }
+
+            // 2. Verifica e persiste o PROCESSO
             ProcessoModel processo;
-            if (dto.getProcesso().getId() != null) {
-                processo = processoRepository.findById(dto.getProcesso().getId())
-                        .orElseThrow();
+            ProcessoDTO processoDTO = dto.getProcesso();
+            if (processoDTO.getId() != null) {
+                processo = processoRepository.findById(processoDTO.getId())
+                        .orElse(new ProcessoModel());
             } else {
                 processo = new ProcessoModel();
             }
-            processo.setNumero(dto.getProcesso().getNumero());
+
+            processo.setNumero(processoDTO.getNumero());
+
+            // 3. Associa o anexo ao processo
+            processo.setAnexo(anexo);
+            processo = processoRepository.save(processo); // Salva o ProcessoModel para torná-lo persistente
+
+            // 4. Associa o processo ao documento
             documento.setProcesso(processo);
         }
 
@@ -120,7 +153,10 @@ public class DocumentoService {
 
         ProcessoDTO processoDTO = null;
         if (model.getProcesso() != null) {
-            processoDTO = new ProcessoDTO(model.getProcesso().getId(), model.getProcesso().getNumero());
+            processoDTO = new ProcessoDTO(
+                    model.getProcesso().getId(), model.getProcesso().getNumero(),
+                    model.getProcesso().getAnexo() != null ? new AnexoDTO(model.getProcesso().getAnexo().getId(),
+                            model.getProcesso().getAnexo().getNumero()) : null);
         }
 
         EnderecoDTO enderecoDTO = null;

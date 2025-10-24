@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.ueredeveloper</groupId>
 	<artifactId>j-neon-connection</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>j-neon-connection</name>
 	<description>Conexão com um Banco Postgres - Neon Servles</description>
 	<url/>

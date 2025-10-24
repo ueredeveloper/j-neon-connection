@@ -7,27 +7,21 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProcessoDTO {
+public class AnexoDTO {
 
     private Long id;
     private String numero;
-    private AnexoDTO anexo;
 
-    public ProcessoDTO() {
+    public AnexoDTO() {
     }
 
-    public ProcessoDTO(Long id, String numero) {
+    public AnexoDTO(Long id, String numero) {
         this.id = id;
         this.numero = numero;
     }
 
-    public ProcessoDTO(String numero) {
+    public AnexoDTO(String numero) {
         this.numero = numero;
     }
 
-    public ProcessoDTO(Long id, String numero, AnexoDTO anexo) {
-        this.id = id;
-        this.numero = numero;
-        this.anexo = anexo;
-    }
 }
